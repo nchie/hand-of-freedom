@@ -1,0 +1,5 @@
+## Interface: 16001
+## Title: Hand of Freedom
+## Notes: Shows the Hand of Freedom app what is under the mouse, so a trackpad swipe can scroll game windows. Reads mouse focus only; changes nothing in the game.
+## Version: 1
+HandOfFreedom.lua
