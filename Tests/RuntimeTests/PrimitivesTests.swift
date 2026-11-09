@@ -5,6 +5,8 @@ import Runtime
 import Synchronization
 import Testing
 
+/// The other side of each test runs on a thread of its own: on a machine with few cores, parallel tests that
+/// spin can keep the shared pool busy and starve it.
 @Suite("Cross-thread primitives")
 struct PrimitivesTests {
     struct Checked: Sendable, BitwiseCopyable, Equatable {
@@ -17,7 +19,7 @@ struct PrimitivesTests {
     @Test func mailboxNeverTearsAndConverges() {
         let box = ConfigMailbox(Checked(0))
         let done = Atomic<Bool>(false)
-        DispatchQueue.global().async {
+        Thread.detachNewThread {
             for i in 1...20_000 { box.publish(Checked(UInt64(i))) }
             done.store(true, ordering: .releasing)
         }
@@ -42,7 +44,7 @@ struct PrimitivesTests {
     @Test func ringPreservesOrderAcrossThreads() {
         let ring = SPSCRing<UInt64>(capacityPowerOfTwo: 256)
         let total: UInt64 = 100_000
-        DispatchQueue.global().async {
+        Thread.detachNewThread {
             var i: UInt64 = 0
             while i < total { if ring.tryPush(i) { i += 1 } }
         }
@@ -82,7 +84,7 @@ struct PrimitivesTests {
         gate.open()
         let inside = DispatchSemaphore(value: 0)
         let finished = Atomic<Bool>(false)
-        DispatchQueue.global().async {
+        Thread.detachNewThread {
             guard gate.enter() else { return }
             inside.signal()
             usleep(20_000)
