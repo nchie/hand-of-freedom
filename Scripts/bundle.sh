@@ -8,7 +8,8 @@ set -euo pipefail
 cd "${0:A:h}/.."
 
 CONFIG="${BUILD:-release}"
-VERSION=$(git describe --tags --always --dirty 2>/dev/null || echo 0.5.0-dev)
+VERSION=$(git describe --tags --always --dirty 2>/dev/null || echo 0.1.0-dev)
+VERSION=${VERSION#v}                  # tag v0.1.0 shows as 0.1.0
 BUILD_NO=$(git rev-list --count HEAD 2>/dev/null || echo 0)
 APP="build/Hand of Freedom.app"
 
